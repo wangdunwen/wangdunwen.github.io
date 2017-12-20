@@ -25,15 +25,3 @@ new Vue({
   template: '<App/>',
   components: { App }
 })
-
-//ios手机端
-// document.addEventListener('deviceready', function() {
-//   new Vue({
-//       el: '#app',
-//       router,
-//       store,
-//       template: '<App/>',
-//       components: { App }
-//   })
-//   window.navigator.splashscreen.hide()
-// }, false);
