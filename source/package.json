@@ -2,7 +2,7 @@
   "name": "ios",
   "version": "1.0.0",
   "description": "A Vue.js project",
-  "author": "wangSilly <wangdunwen0619@gmail.com>",
+  "author": "wangdunwen <wangdunwen0619@gmail.com>",
   "private": true,
   "scripts": {
     "dev": "node build/dev-server.js",
