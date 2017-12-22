@@ -7,7 +7,7 @@ import store from './store'
 
 //引入UI库
 import ElementUI from 'element-ui'
-// import 'element-ui/lib/theme-default/index.css'
+import 'element-ui/lib/theme-chalk/index.css'
 import MuseUI from 'muse-ui'
 import 'muse-ui/dist/muse-ui.css'
 import 'muse-ui/dist/theme-light.css'
