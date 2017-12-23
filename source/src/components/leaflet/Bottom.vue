@@ -28,7 +28,7 @@ export default {
 <style lang='less' scoped>
     .bottom {
         position: absolute;
-        top: 90%;
+        top: 80%;
         z-index: 1000;
     }
 </style>
