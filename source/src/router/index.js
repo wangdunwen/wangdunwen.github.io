@@ -8,7 +8,7 @@ import Leaflet from '@/components/leaflet/Leaflet'
 Vue.use(Router);
 
 let router = new Router({
-    mode: 'history',
+    // mode: 'history',
     routes: [
         {
             path: '/',
@@ -34,13 +34,13 @@ let router = new Router({
 });
 
 /*自动刷新，路由重定向到根路由*/
-router.beforeEach((to, from, next) => {
-    if(from.name === null && to.name !== 'loading') {
-        next('/');
-    }else {
-        next();
-    }
-});
+// router.beforeEach((to, from, next) => {
+//     if(from.name === null && to.name !== 'loading') {
+//         next('/');
+//     }else {
+//         next();
+//     }
+// });
 
 export default router;
 

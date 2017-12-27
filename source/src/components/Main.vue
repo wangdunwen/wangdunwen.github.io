@@ -200,6 +200,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'main',
   data () {
@@ -295,13 +297,13 @@ export default {
                   if(cm.id === this.replyInfo.id) {
                       cm.child.push(comment);
 
-                      this.$http.post('http://101.201.232.4/github.io/updateChild', JSON.stringify(cm))
+                      axios.post('http://101.201.232.4/github.io/updateChild', cm)
                           .then((response) => {
                               // 插入评论列表
                               let date = new Date();
                               date.setTime(comment.time);
                               comment.time = date.toLocaleString();
-                              console.log(response.body);
+                              console.log(response.data);
                           }).catch((error) => {
                               console.log(error);
                           })
@@ -315,7 +317,7 @@ export default {
               comment.id = id;
               comment.child = [];
 
-              this.$http.post('http://101.201.232.4/github.io/comment', JSON.stringify(comment))
+              axios.post('http://101.201.232.4/github.io/comment', comment)
                   .then((response) => {
 
                       // 插入评论列表
@@ -388,9 +390,10 @@ export default {
       }
   },
   mounted() { 
-      this.$http.get('http://101.201.232.4/github.io/getComments')
+      axios.get('http://101.201.232.4/github.io/getComments')
           .then((response) => {
-              for(let comment of response.body) {
+              // console.log(response);
+              for(let comment of response.data) {
                   comment.child = JSON.parse(comment.child);
                   let date = new Date();
                   date.setTime(comment.time);
