@@ -161,25 +161,25 @@
                     <div v-for="comment in comments" style="margin-top: 20px;">
                         <el-card class="box-card" style="width: 100%;">
                             <mu-list-item :title="comment.name" disabled>
-                                <mu-avatar slot="left" v-if="current_login === 'admin'" src="https://s.gravatar.com/avatar/29fd983b2f7704afbd9029121d8fb7a4?s=80"/>
-                                <mu-avatar slot="left" v-if="current_login === 'user'" icon="person"/>
+                                <mu-avatar slot="left" v-if="comment.email === 'dwwang@mail.ie.ac.cn'" src="https://s.gravatar.com/avatar/29fd983b2f7704afbd9029121d8fb7a4?s=80"/>
+                                <mu-avatar slot="left" v-else icon="person"/>
                             </mu-list-item>
                             <mu-card-text>{{ comment.comments }}</mu-card-text>
                             <mu-card-text style="font-size:12px;">
-                                {{ (new Date(comment.time)).toLocaleString() }}&nbsp;&nbsp;&nbsp;
+                                {{ comment.time }}&nbsp;&nbsp;&nbsp;
                                 <i class="el-icon-edit-outline" style="cursor:pointer;" @click="reply(comment)">&nbsp;回复</i>
                             </mu-card-text>
                             <!-- 如果有子评论 -->
                             <div v-if="comment.child.length > 0">
                                 <el-card class="box-card" style="width: 100%;background-color:#EDEDED;margin-top:10px;" v-for="(child, index) in comment.child" :key="index">
                                     <mu-list-item :title="child.name + ' ' + (index+1) + '楼'" disabled color="blue">
-                                        <mu-avatar slot="left" v-if="current_login === 'admin'" 
+                                        <mu-avatar slot="left" v-if="child.email === 'dwwang@mail.ie.ac.cn'" 
                                         src="https://s.gravatar.com/avatar/29fd983b2f7704afbd9029121d8fb7a4?s=80"/>
-                                        <mu-avatar slot="left" v-if="current_login === 'user'" icon="person"/>
+                                        <mu-avatar slot="left" v-else icon="person"/>
                                     </mu-list-item>
                                     <mu-card-text><span style="color:blue;">@{{ child.target }} </span>&nbsp; {{ child.comments }}</mu-card-text>
                                     <mu-card-text style="font-size:12px;">
-                                        {{ (new Date(child.time)).toLocaleString() }}&nbsp;&nbsp;&nbsp;
+                                        {{ child.time }}&nbsp;&nbsp;&nbsp;
                                         <i class="el-icon-edit-outline" style="cursor:pointer;" @click="reply(comment, child.name)">&nbsp;回复</i>
                                     </mu-card-text>
                                 </el-card>
@@ -294,6 +294,17 @@ export default {
               for(let cm of this.comments) {
                   if(cm.id === this.replyInfo.id) {
                       cm.child.push(comment);
+
+                      this.$http.post('http://101.201.232.4/github.io/updateChild', JSON.stringify(cm))
+                          .then((response) => {
+                              // 插入评论列表
+                              let date = new Date();
+                              date.setTime(comment.time);
+                              comment.time = date.toLocaleString();
+                              console.log(response.body);
+                          }).catch((error) => {
+                              console.log(error);
+                          })
                       this.show_reply = false;
                       this.replyInfo.target = "";
                       this.replyInfo.id = "";
@@ -303,10 +314,19 @@ export default {
           }else {
               comment.id = id;
               comment.child = [];
-              this.comments.push(comment);
-          }
 
-          console.log(this.comments);
+              this.$http.post('http://101.201.232.4/github.io/comment', JSON.stringify(comment))
+                  .then((response) => {
+
+                      // 插入评论列表
+                      let date = new Date();
+                      date.setTime(comment.time);
+                      comment.time = date.toLocaleString();
+                      this.comments.push(comment);
+                  }).catch((error) => {
+                      console.log(error);
+                  })
+          }
 
           this.$notify({
               title: '成功',
@@ -368,7 +388,26 @@ export default {
       }
   },
   mounted() { 
-      
+      this.$http.get('http://101.201.232.4/github.io/getComments')
+          .then((response) => {
+              for(let comment of response.body) {
+                  comment.child = JSON.parse(comment.child);
+                  let date = new Date();
+                  date.setTime(comment.time);
+                  comment.time = date.toLocaleString();
+
+                  if(comment.child.length !== 0) {
+                      for(let child of comment.child) {
+                          let date1 = new Date();
+                          date1.setTime(child.time);
+                          child.time = date1.toLocaleString();
+                      }
+                  }
+                  this.comments.push(comment);
+              }
+          }).catch((error) => {
+              console.log(error);
+          });
   }
 }
 </script>

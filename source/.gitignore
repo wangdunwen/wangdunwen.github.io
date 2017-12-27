@@ -8,7 +8,7 @@ yarn-error.log*
 # Editor directories and files
 .idea
 .vscode
-src/assets/js
+src
 *.suo
 *.ntvs*
 *.njsproj
