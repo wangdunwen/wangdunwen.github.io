@@ -18,7 +18,7 @@
             <mu-icon-button icon="menu" slot="right" @click="toggle(true)"/>
         </mu-appbar>
         <!-- 底部返回按钮 -->
-        <mu-avatar icon="keyboard_arrow_right" color="white" backgroundColor="blue" :size="50" 
+        <mu-avatar icon="keyboard_arrow_right" color="white" backgroundColor="#009688" :size="50" 
         style="margin-top:10px;cursor:pointer;" :iconSize="24" v-show="!appbarShow" @click="takeBack"/> 
         <!-- 抽屉 -->
         <mu-drawer right :open="drawOpen" :docked="docked" @close="toggle()" style="background-color: #B0E2FF;opacity: 0.9;">

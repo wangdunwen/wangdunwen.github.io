@@ -10,7 +10,7 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import MuseUI from 'muse-ui'
 import 'muse-ui/dist/muse-ui.css'
-import 'muse-ui/dist/theme-light.css'
+import 'muse-ui/dist/theme-teal.css'
 
 Vue.config.productionTip = false
 

@@ -14,7 +14,7 @@ let router = new Router({
             path: '/',
             name: 'loading',
             component: Loading
-          },
+        },
         {
             path: '/main',
             name: 'main',
