@@ -18,7 +18,14 @@ let router = new Router({
         {
             path: '/main',
             name: 'main',
-            component: Main
+            component: Main,
+            // children: [
+            //     {
+            //         path: '/main/article/:id',
+            //         name: 'article',
+            //         component: Main
+            //     }
+            // ]
         },
         {
             path: '/cesium',

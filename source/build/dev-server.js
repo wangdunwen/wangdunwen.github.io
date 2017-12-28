@@ -21,7 +21,25 @@ const autoOpenBrowser = !!config.dev.autoOpenBrowser
 // https://github.com/chimurai/http-proxy-middleware
 const proxyTable = config.dev.proxyTable
 
-const app = express()
+const app = express();
+
+//------
+// var router = express.Router();
+// var fs = require('fs');
+// router.get("/mdtest", function (req,res) {
+//     console.log('enter it');
+//     fs.readFile('build/test.md', function (err, data) {
+//         if (err) {
+//             console.log(err);
+//         } else {
+//             res.end(data);
+//         }
+//     })
+// });
+// app.use(router);
+
+//------
+
 const compiler = webpack(webpackConfig)
 
 const devMiddleware = require('webpack-dev-middleware')(compiler, {

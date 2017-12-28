@@ -15,10 +15,7 @@ export default {
     }
   },
   mounted() { 
-      let _this = this;
-      setTimeout(() => {
-          _this.$router.replace('/main');
-      }, 1000);
+      this.$router.push({name: 'main'});
   }
 }
 </script>

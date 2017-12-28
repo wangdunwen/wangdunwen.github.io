@@ -34,6 +34,28 @@ module.exports = {
         options: vueLoaderConfig
       },
       {
+        test: /\.md$/,
+        loader: 'text-loader',
+        // include: [resolve('static')],
+        options: {
+          preventExtract: true
+        }
+      },
+      // {
+      //     test: /\.md$/,
+      //     use: [
+      //         {
+      //             loader: "html-loader"
+      //         },
+      //         {
+      //             loader: "markdown-loader",
+      //             options: {
+      //                 /* your options here */
+      //             }
+      //         }
+      //     ]
+      // },
+      {
         test: /\.js$/,
         loader: 'babel-loader',
         include: [resolve('src'), resolve('test')]
