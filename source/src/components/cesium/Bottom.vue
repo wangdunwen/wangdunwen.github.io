@@ -62,7 +62,7 @@ export default {
 <style lang='less' scoped>
     .bottom {
         position: absolute;
-        top: 80%;
+        top: 75%;
         display: flex;
         flex-direction: column;
     }

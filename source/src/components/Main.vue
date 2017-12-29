@@ -7,7 +7,7 @@
         <div class="arrowRight" @click="resize" v-show='arrowRightShow'>
             <i class="el-icon-caret-right" style="color:white;"></i>
         </div>
-        <left v-show='leftShow'></left>
+        <left v-show='leftShow' class='left'></left>
         <right :style="rightStyle"></right>
     </div>
 </template>
@@ -47,7 +47,7 @@ export default {
           this.arrowLeftShow = true;
           this.arrowRightShow = false;
           this.rightStyle = {
-              left: '25%'
+              left: '340px'
           };
       },
   },
@@ -72,8 +72,8 @@ export default {
 
     .arrowLeft {
         position:absolute;
-        top: 15%;
-        left: 19%;
+        top: 13%;
+        left: 280px;
         padding: 1%;
         z-index: 111000;
         cursor:pointer;
@@ -83,9 +83,18 @@ export default {
         font-size: 2rem;
     }
 
+    .left {
+        position: absolute;
+        top: 13%;
+        left: 20px;
+        display: flex;
+        flex-direction: column;
+        width: 300px;
+    }
+
     .arrowRight {
         position:absolute;
-        top: 15%;
+        top: 13%;
         height: 10%;
         width: 2.4%;
         left: 0%;
@@ -104,6 +113,10 @@ export default {
         }
 
         .arrowRight {
+            display: none;
+        }
+
+        .left {
             display: none;
         }
     }

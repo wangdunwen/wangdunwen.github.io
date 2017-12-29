@@ -38,7 +38,7 @@ export default {
       });
 
       //添加zoomControl & compass
-      viewer.extend(Cesium.viewerCesiumNavigationMixin, {enableZoomControls: true, enableCompass: true});
+      viewer.extend(Cesium.viewerCesiumNavigationMixin, {enableZoomControls: true, enableCompass: false});
 
       //去除Cesium图标和版本信息
       viewer._cesiumWidget._creditContainer.style.display = "none";

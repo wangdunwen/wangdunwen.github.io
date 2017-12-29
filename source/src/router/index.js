@@ -4,6 +4,7 @@ import Main from '@/components/Main'
 import Loading from '@/components/loading/Loading'
 import Cesium from '@/components/cesium/Cesium'
 import Leaflet from '@/components/leaflet/Leaflet'
+import Page from '@/components/page/Page'
 
 Vue.use(Router);
 
@@ -36,6 +37,11 @@ let router = new Router({
             path: '/leaflet',
             name: 'leaflet',
             component: Leaflet
+        },
+        {
+            path: '/page',
+            name: 'page',
+            component: Page
         }
     ]
 });
