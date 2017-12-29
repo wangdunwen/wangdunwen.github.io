@@ -24,7 +24,8 @@ export default {
           leftShow: true,
           arrowLeftShow: true,
           arrowRightShow: false,
-          rightStyle: {}
+          rightStyle: {},
+          screenWidth: document.body.clientWidth
       }
   },
   components: {
@@ -48,10 +49,15 @@ export default {
           this.rightStyle = {
               left: '25%'
           };
-      }
+      },
   },
   mounted() { 
-
+      let _this = this;
+      window.onresize = function temp() {
+          if(document.body.scrollWidth <= 800) {
+              _this.rightStyle = {};
+          }
+      }
   }
 }
 </script>
@@ -90,6 +96,16 @@ export default {
         justify-content: center;
         align-items: center;
         font-size: 2rem;
+    }
+
+    @media only screen and (max-width: 800px) {
+        .arrowLeft {
+            display: none;
+        }
+
+        .arrowRight {
+            display: none;
+        }
     }
 
 </style>
