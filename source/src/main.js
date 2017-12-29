@@ -4,6 +4,8 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import store from './store'
+import 'highlight.js/styles/googlecode.css'
+import hljs from 'highlight.js'
 // import VueResource from 'vue-resource'
 
 //引入UI库
@@ -18,6 +20,20 @@ Vue.config.productionTip = false
 Vue.use(ElementUI);
 Vue.use(MuseUI);
 // Vue.use(VueResource);
+
+// hljs.highlightCode = function(el) { //自定义highlightCode方法，将只执行一次的逻辑去掉
+// 	let blocks = el.querySelectorAll('pre code');
+// 	blocks.forEach((block)=>{
+// 		hljs.highlightBlock(block)
+// 	})
+// };
+
+Vue.directive('highlight',function (el) {
+	let blocks = el.querySelectorAll('pre code');
+	blocks.forEach((block)=>{
+		hljs.highlightBlock(block)
+	})
+})
 
 /* eslint-disable no-new */
 new Vue({
