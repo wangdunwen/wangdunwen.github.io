@@ -56,6 +56,12 @@ export default {
       window.onresize = function temp() {
           if(document.body.scrollWidth <= 800) {
               _this.rightStyle = {};
+          }else {
+              if(!_this.leftShow) {
+                  _this.rightStyle = {
+                      left: '3%'
+                  };
+              }
           }
       }
   }
