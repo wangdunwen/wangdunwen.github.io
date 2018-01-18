@@ -23,12 +23,13 @@
         <!-- 抽屉 -->
         <mu-drawer right :open="drawOpen" :docked="docked" @close="toggle()" style="background-color: #B0E2FF;opacity: 0.9;">
             <mu-list @itemClick="docked ? '' : toggle()">
-                <mu-list-item title="Menu Item 1"/>
-                <mu-list-item title="Menu Item 2"/>
-                <mu-list-item title="Menu Item 3"/>
+                <mu-list-item title="画面" @click="drawPolygon"/>
+                <mu-list-item title="编辑面" @click="editPolygon"/>
                 <mu-list-item v-if="docked" @click.native="open = false" title="Close"/>
             </mu-list>
         </mu-drawer>
+        <mu-raised-button label="结束标绘" class="demo-raised-button" primary style="position:absolute;top:100%;left: 45%;" v-show="drawPolygonShow" @click="endPlot"/>
+        <mu-raised-button label="结束编辑" class="demo-raised-button" primary style="position:absolute;top:100%;left: 45%;" v-show="editPolygonShow" @click="endEditPolygon"/>
     </div>    
 </template>
 
@@ -41,7 +42,11 @@ export default {
           appbarShow: false,
           leftTop: {horizontal: 'left', vertical: 'top'},
           drawOpen: false,
-          docked: true
+          docked: true,
+          pointsId: [],
+          drawPolygonShow: false,
+          handler: null,
+          editPolygonShow: false
       }
   },
   methods: {
@@ -59,6 +64,187 @@ export default {
       toggle(flag) {
           this.drawOpen = !this.drawOpen
           this.docked = !flag
+      },
+      drawPolygon() {
+          this.drawPolygonShow = true;
+          this.handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+
+          let gon = undefined;
+
+          let points = [];
+
+          // 对鼠标按下事件的监听
+          this.handler.setInputAction((event) => {
+              let windowPosition = event.position;
+              let ellipsoid = viewer.scene.globe.ellipsoid;
+              let cartesian = viewer.camera.pickEllipsoid(windowPosition, ellipsoid);
+
+              if (!cartesian) {
+                  return;
+              }
+
+              let point = viewer.entities.add({
+                  name: 'gon_point',
+                  position: cartesian,
+                  point: {
+                      color: Cesium.Color.WHITE,
+                      pixelSize: 5,
+                      outlineColor: Cesium.Color.BLACK,
+                      outlineWidth: 1
+                  }
+              });
+
+              this.pointsId.push(point.id);
+
+              points.push(cartesian);
+
+              if (points.length >= 3) {
+                  if (gon === undefined) {
+                      gon = viewer.entities.add({
+                          name: 'polygon',
+                          polygon: {
+                              hierarchy: points,
+                              material: Cesium.Color.RED.withAlpha(0.5)
+                          }
+                      });
+                  } else {
+                      gon.polygon.hierarchy = points
+                  }
+              }
+
+              // if (points.length >= 3) {
+              //     if (gon === undefined) {
+              //         gon = viewer.entities.add({
+              //             name: 'polygon',
+              //             polygon: {
+              //                 hierarchy: new Cesium.CallbackProperty(() => {
+              //                     return points;
+              //                 }, false),
+              //                 material: Cesium.Color.RED.withAlpha(0.5)
+              //             }
+              //         });
+              //     }
+              // } else {
+              //     gon.polygon.hierarchy = new Cesium.CallbackProperty(() => {
+              //         return points;
+              //     }, false);
+              // }
+          }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+      },
+      endPlot() {
+          this.drawPolygonShow = false;
+
+          if (this.handler !== null && !this.handler.isDestroyed()) {
+              this.handler.destroy();
+          }
+
+          for (let id of this.pointsId) {
+              viewer.entities.removeById(id);
+          }
+
+          this.pointsId = [];
+      },
+      editPolygon() {
+          this.editPolygonShow = true;
+
+          this.handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+
+          let gon = undefined;
+
+          let isEditting = false;
+
+          let currentPoint = undefined;
+
+          this.pointsId = [];
+
+          // 对鼠标按下事件的监听
+          this.handler.setInputAction((event) => {
+              let windowPosition = event.position;
+              let pickedObject = viewer.scene.pick(windowPosition);
+
+              if (Cesium.defined(pickedObject)) {
+                  let entity = pickedObject.id;
+
+                  if (entity.name === "polygon" && !isEditting) {
+                      gon = entity;
+
+                      // 生成编辑点
+                      for (let cartesian of gon.polygon.hierarchy._value) {
+                          let point = viewer.entities.add({
+                              name: "gon_point",
+                              position: cartesian,
+                              point: {
+                                  color: Cesium.Color.WHITE,
+                                  pixelSize: 8,
+                                  outlineColor: Cesium.Color.BLACK,
+                                  outlineWidth: 1
+                              }
+                          });
+
+                          this.pointsId.push(point.id);
+                      }
+
+                      isEditting = true;
+
+                      viewer.scene.screenSpaceCameraController.enableRotate = false;
+                      viewer.scene.screenSpaceCameraController.enableZoom = false;
+                  } else if (entity.name === "gon_point") {
+                      currentPoint = entity;
+                  }
+              }
+          }, Cesium.ScreenSpaceEventType.LEFT_DOWN);
+
+          // 对鼠标移动事件的监听
+          this.handler.setInputAction((event) => {
+              if (isEditting && currentPoint) {
+                  let windowPosition = event.startPosition;
+                  let ellipsoid = viewer.scene.globe.ellipsoid;
+                  let cartesian = viewer.camera.pickEllipsoid(windowPosition, ellipsoid);
+
+                  if (!cartesian) {
+                      return;
+                  }
+
+                  currentPoint.position = cartesian;
+
+                  let points = [];
+
+                  for (let id of this.pointsId) {
+                      points.push(viewer.entities.getById(id).position._value);
+                  }
+
+                  gon.polygon.hierarchy = new Cesium.CallbackProperty(() => {
+                      return points;
+                  }, false);
+
+                  // gon.polygon.hierarchy = new Cesium.CallbackProperty(() => {
+                  //     return Cesium.Cartesian3.fromDegreesArray(points);
+                  // }, false);
+
+              }
+          }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+
+          // 对鼠标抬起事件的监听
+          this.handler.setInputAction((event) => {
+              // isEditting = false;
+              currentPoint = undefined;
+          }, Cesium.ScreenSpaceEventType.LEFT_UP);
+      },
+      endEditPolygon() {
+          this.editPolygonShow = false;
+
+          viewer.scene.screenSpaceCameraController.enableRotate = true;
+          viewer.scene.screenSpaceCameraController.enableZoom = true;
+
+          if (this.handler !== null && !this.handler.isDestroyed()) {
+              this.handler.destroy();
+          }
+
+          for (let id of this.pointsId) {
+              viewer.entities.removeById(id);
+          }
+
+          this.pointsId = [];
       }
   },
   mounted() { 
