@@ -25,11 +25,20 @@
             <mu-list @itemClick="docked ? '' : toggle()">
                 <mu-list-item title="画面" @click="drawPolygon"/>
                 <mu-list-item title="编辑面" @click="editPolygon"/>
+                <mu-list-item title="镜头缩放插件" @click="showZoomControl"/>
                 <mu-list-item v-if="docked" @click.native="open = false" title="Close"/>
             </mu-list>
         </mu-drawer>
         <mu-raised-button label="结束标绘" class="demo-raised-button" primary style="position:absolute;top:100%;left: 45%;" v-show="drawPolygonShow" @click="endPlot"/>
         <mu-raised-button label="结束编辑" class="demo-raised-button" primary style="position:absolute;top:100%;left: 45%;" v-show="editPolygonShow" @click="endEditPolygon"/>
+
+        <!-- 视角缩放工具 -->
+        <div style="position: absolute;top: 300px;left:5px;z-index: 10010;" v-show="zoomControlShow">
+            <el-button-group>
+                <el-button type="primary" @click="zoomIn">+</el-button>
+                <el-button type="primary" @click="zoomOut">-</el-button>
+            </el-button-group>
+        </div>
     </div>    
 </template>
 
@@ -46,7 +55,8 @@ export default {
           pointsId: [],
           drawPolygonShow: false,
           handler: null,
-          editPolygonShow: false
+          editPolygonShow: false,
+          zoomControlShow: false
       }
   },
   methods: {
@@ -103,32 +113,18 @@ export default {
                       gon = viewer.entities.add({
                           name: 'polygon',
                           polygon: {
-                              hierarchy: points,
+                              hierarchy: new Cesium.CallbackProperty(() => {
+                                  return points;
+                              }, false),
                               material: Cesium.Color.RED.withAlpha(0.5)
                           }
                       });
                   } else {
-                      gon.polygon.hierarchy = points
+                      gon.polygon.hierarchy = new Cesium.CallbackProperty(() => {
+                          return points;
+                      }, false);
                   }
-              }
-
-              // if (points.length >= 3) {
-              //     if (gon === undefined) {
-              //         gon = viewer.entities.add({
-              //             name: 'polygon',
-              //             polygon: {
-              //                 hierarchy: new Cesium.CallbackProperty(() => {
-              //                     return points;
-              //                 }, false),
-              //                 material: Cesium.Color.RED.withAlpha(0.5)
-              //             }
-              //         });
-              //     }
-              // } else {
-              //     gon.polygon.hierarchy = new Cesium.CallbackProperty(() => {
-              //         return points;
-              //     }, false);
-              // }
+              } 
           }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
       },
       endPlot() {
@@ -245,6 +241,41 @@ export default {
           }
 
           this.pointsId = [];
+      },
+      showZoomControl() {
+          this.zoomControlShow = true;
+      },
+      zoomIn() {
+          let cameraPos = viewer.camera.position;
+          let ellipsoid = viewer.scene.globe.ellipsoid;
+          let cartographic = ellipsoid.cartesianToCartographic(cameraPos);
+          let height = cartographic.height;
+
+          // viewer.camera.zoomIn(height / 3);
+
+          let centerLon = parseFloat(Cesium.Math.toDegrees(cartographic.longitude).toFixed(8));
+          let centerLat = parseFloat(Cesium.Math.toDegrees(cartographic.latitude).toFixed(8));
+
+          viewer.camera.flyTo({
+              destination: Cesium.Cartesian3.fromDegrees(centerLon, centerLat, height / 1.8),
+              duration: 1.0
+          });
+      },
+      zoomOut() {
+          let cameraPos = viewer.camera.position;
+          let ellipsoid = viewer.scene.globe.ellipsoid;
+          let cartographic = ellipsoid.cartesianToCartographic(cameraPos);
+          let height = cartographic.height;
+
+          // viewer.camera.zoomOut(height * 1.2);
+
+          let centerLon = parseFloat(Cesium.Math.toDegrees(cartographic.longitude).toFixed(8));
+          let centerLat = parseFloat(Cesium.Math.toDegrees(cartographic.latitude).toFixed(8));
+
+          viewer.camera.flyTo({
+              destination: Cesium.Cartesian3.fromDegrees(centerLon, centerLat, height * 1.8),
+              duration: 1.0
+          });
       }
   },
   mounted() { 
