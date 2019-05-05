@@ -1,2 +1,2 @@
 # wangdunwen.github.io
-王敦文个人主页
+个人博客主页
