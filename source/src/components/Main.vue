@@ -1,7 +1,7 @@
 <template>
-  <div class='main'>
+  <div class="main" ref="main">
     <top></top>
-    <div class="arrowLeft" @click="expand" v-show='arrowLeftShow'>
+    <div class="arrowLeft" @click="expand" v-show="arrowLeftShow">
       <i class="el-icon-caret-left" style="color: #009688;"></i>
     </div>
     <div class="arrowRight" @click="resize" v-show='arrowRightShow'>
@@ -60,10 +60,18 @@ export default {
       } else {
         if (!_this.leftShow) {
           _this.rightStyle = {
-            left: '3%'
+            left: "3%"
           };
         }
       }
+    }
+  },
+  watch: {
+    "$route": function () {
+      // 让滚动条滚动至
+      // this.$refs.main.scrollTop = "0px";
+      // document.body.scrollTop = "0px";
+      window.scrollTo(0,0);
     }
   }
 }
